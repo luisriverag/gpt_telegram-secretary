@@ -1,12 +1,15 @@
 import os
+import io
 import logging
+import requests
 import telegram
+import speech_recognition as sr
+from pydub import AudioSegment
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext
-import requests
 
-TELEGRAM_TOKEN = '<your_telegram_token>'
-OPENAI_API_KEY = '<your_openai_api_key>'
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_API_KEY")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
@@ -16,6 +19,18 @@ def start(update: Update, context: CallbackContext) -> None:
     user_id = update.message.chat_id
     user_conversations[user_id] = [{'role': 'system', 'content': 'You are chatting with an AI assistant.'}]
     update.message.reply_text('Hi! You are chatting with a bot from @luisriverag developed by GPT4. It uses GPT3.5 via API amongst others.')
+
+def transcribe_audio(file_path):
+    recognizer = sr.Recognizer()
+    audio = AudioSegment.from_ogg(file_path)
+    audio.export("temp.wav", format="wav")
+    with sr.AudioFile("temp.wav") as source:
+        audio_data = recognizer.record(source)
+    try:
+        text = recognizer.recognize_google(audio_data)
+    except sr.UnknownValueError:
+        text = None
+    return text
 
 def chatgpt_request(prompt, conversation_history):
     headers = {
@@ -32,7 +47,17 @@ def chatgpt_request(prompt, conversation_history):
 
 def chat(update: Update, context: CallbackContext) -> None:
     user_id = update.message.chat_id
-    prompt = update.message.text
+
+    if update.message.voice:
+        file = context.bot.getFile(update.message.voice.file_id)
+        file.download("voice_note.oga")
+
+        prompt = transcribe_audio("voice_note.oga")
+        if prompt is None:
+            update.message.reply_text("Sorry, I couldn't understand the voice note. Please try again.")
+            return
+    else:
+        prompt = update.message.text
 
     if user_id not in user_conversations:
         user_conversations[user_id] = [{'role': 'system', 'content': 'You are chatting with an AI assistant.'}]
@@ -47,7 +72,7 @@ def main() -> None:
     updater = Updater(TELEGRAM_TOKEN)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler('start', start))
-    dispatcher.add_handler(MessageHandler(telegram.ext.Filters.text & ~telegram.ext.Filters.command, chat))
+    dispatcher.add_handler(MessageHandler((telegram.ext.Filters.text | telegram.ext.Filters.voice) & ~telegram.ext.Filters.command, chat))
 
     updater.start_polling()
     updater.idle()
