@@ -1,4 +1,4 @@
-A Telegram bot connected to ChatGPT API written in Python
+A Telegram bot connected to ChatGPT API written in Python. Understands voice commands
 
 Code credit goes to GPT4, I just helped with a few prompts
 
