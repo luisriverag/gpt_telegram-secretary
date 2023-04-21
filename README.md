@@ -1,3 +1,5 @@
+A Telegram bot connected to ChatGPT API written in Python
+
 Code credit goes to GPT4, I just helped with a few prompts
 
 You'll need to add your OpenAI and Telegram API keys, and probably install required libraries with
