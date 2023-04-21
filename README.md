@@ -39,3 +39,14 @@ Type "/start" and send the message.
 Follow the instructions that BotFather sends you to set up your new bot, including giving it a name and a username.
 
 Once you have created your bot, BotFather will send you an API token. Keep this token safe, as it will be required to interact with your bot using the Telegram API.
+
+
+----
+
+To add them at the end of your bashrc
+
+nano  ~/.bashrc
+
+export TELEGRAM_API_KEY="<your_telegram_token>"
+export OPENAI_API_KEY="<your_openai_api_key>"
+
