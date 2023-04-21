@@ -26,6 +26,7 @@ Once you're logged in, click on the "API keys" link at the top of the page.
 
 Click on the "Create API key" button and follow the instructions to generate your API key.
 
+-----
 
 To create a new Telegram bot with BotFather:
 
