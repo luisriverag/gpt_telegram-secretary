@@ -1,6 +1,6 @@
-A Telegram bot connected to ChatGPT API written in Python. Understands voice commands
+A Telegram bot connected to ChatGPT API written in Python. Understands voice commands, and sends its replies both as text and voice attachments
 
-Code credit goes to GPT4, I just helped with a few prompts
+Dev credit goes to GPT4, I just helped with a few prompts
 
 You'll need to add your OpenAI and Telegram API keys, and probably install required libraries with
 
