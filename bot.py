@@ -1,10 +1,11 @@
 import os
-import io
 import logging
 import requests
 import telegram
 import speech_recognition as sr
 from pydub import AudioSegment
+from gtts import gTTS
+import tempfile
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext
 
@@ -68,11 +69,19 @@ def chat(update: Update, context: CallbackContext) -> None:
     
     update.message.reply_text(response)
 
+    # Convert response to audio and send as a voice message
+    tts = gTTS(text=response, lang='en')
+    with tempfile.NamedTemporaryFile(mode="wb", suffix=".mp3", delete=False) as f:
+        tts.save(f.name)
+        f.flush()
+        update.message.reply_voice(voice=open(f.name, 'rb'))
+        os.unlink(f.name)
+
 def main() -> None:
     updater = Updater(TELEGRAM_TOKEN)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler('start', start))
-    dispatcher.add_handler(MessageHandler((telegram.ext.Filters.text | telegram.ext.Filters.voice) & ~telegram.ext.Filters.command, chat))
+    dispatcher.add_handler(MessageHandler((telegram.ext.Filters.text | telegram.ext.Filters.voice), chat))
 
     updater.start_polling()
     updater.idle()
