@@ -2,3 +2,4 @@ python-telegram-bot==13.7
 requests==2.26.0
 SpeechRecognition==3.8.1
 pydub==0.25.1
+gtts==2.2.3
